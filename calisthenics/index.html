@@ -253,7 +253,7 @@ document.addEventListener('change',e=>{
   persist();
   recount();
 });
-setInterval(expireOldSets,60*60*1000);
+setInterval(expireOldSets,30*60*1000);
 window.addEventListener('focus',expireOldSets);
 window.addEventListener('pageshow',expireOldSets);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)expireOldSets()});
