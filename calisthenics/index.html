@@ -62,6 +62,15 @@
   .topbar .links a.home-link{color:#006c6d;background:#eaf7f3;border-color:#a9cfca}
   .topbar .links a:focus-visible{outline:2px solid #007e80;outline-offset:2px}
 }
+
+/* Screen Wake Lock is opt-in for each visit; no background wake lock. */
+.wake-control{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 16px;margin:12px 0 18px;border:1px solid #b6d7d3;background:#edf8f5;border-radius:12px}
+.wake-control button{background:#fff;border:1px solid #80b9b2;border-radius:9px;padding:9px 14px;color:#075f62;font-weight:800;cursor:pointer;min-height:42px}
+.wake-control button:hover{background:#dcf1e9}
+.wake-control button[aria-pressed="true"]{background:#007e80;color:white;border-color:#007e80}
+.wake-control button:disabled{opacity:.6;cursor:not-allowed}
+.wake-control #wake-status{font-size:12px;color:#45666a;flex:1;min-width:170px}
+@media print{.wake-control{display:none!important}}
 </style></head><body>
 <div class="topbar"><nav class="nav"><div class="brand">CALIS<span>THENICS</span> <small style="font-size:10px;color:#718792">V3</small></div><div class="links"><a class="home-link" href="../" title="Na hlavnú stránku">← Domov</a><a href="#rozpis">Rozpis</a><a href="#cvicenia">Tréningy</a><a href="#varianty">Varianty</a><a href="#atlas">Videoatlas</a></div></nav></div>
 <main class="shell">
@@ -72,7 +81,11 @@
 <div class="milestones"><div class="mile"><b>1–3 · Budovanie</b><p>Rozsahy podľa tvojich maxím. Najprv kvalita, potom vyšší počet opakovaní.</p></div><div class="mile"><b>4 · Odľahčenie</b><p>Automaticky menej sérií. Pri veľkej únave môžeš skrátiť tréning ešte viac.</p></div><div class="mile"><b>5–7 · Zlepšovanie</b><p>Dosiahni hornú hranicu v sériách, potom zvoľ ťažší variant.</p></div><div class="mile"><b>8 · Retest</b><p>Odľahči a zopakuj test čistých zhybov, dipov, klikov a zdvihov kolien.</p></div></div>
 </section>
 <section id="cvicenia"><div class="section-head"><div class="eyebrow">TVOJ TÝŽDEŇ</div><h2>Tréning po jednotlivých cvikoch</h2><p>Označ si dokončené série. Zaškrtávanie sa ukladá do prehliadača, pokiaľ to nastavenia umožňujú.</p></div>
-<p class="rest-hint"><b>Novinka:</b> Po zaškrtnutí série sa spustí časovač prestávky. <b>Zaškrtnutia sa automaticky vymažú po 10 hodinách</b> od dokončenia každej série. Každý deň môžeš zbaliť alebo rozbaliť.</p><div class="day-nav"><a href="#mon">Po<small>Muscle-up</small></a><a href="#tue">Ut<small>Nohy</small></a><a href="#wed">St<small>Vrchná časť</small></a><a href="#thu">Št<small>Nohy</small></a><a href="#fri">Pi<small>Muscle-up</small></a></div>
+<p class="rest-hint"><b>Novinka:</b> Po zaškrtnutí série sa spustí časovač prestávky. <b>Zaškrtnutia sa automaticky vymažú po 10 hodinách</b> od dokončenia každej série. Každý deň môžeš zbaliť alebo rozbaliť.</p><div class="wake-control" aria-label="Nastavenie obrazovky">
+  <button type="button" id="wake-toggle" aria-pressed="false" aria-describedby="wake-status">☀ Nezhasínať displej</button>
+  <span id="wake-status" role="status" aria-live="polite">Vypnuté. Zapni počas tréningu, aby displej nezhasínal.</span>
+</div>
+<div class="day-nav"><a href="#mon">Po<small>Muscle-up</small></a><a href="#tue">Ut<small>Nohy</small></a><a href="#wed">St<small>Vrchná časť</small></a><a href="#thu">Št<small>Nohy</small></a><a href="#fri">Pi<small>Muscle-up</small></a></div>
 <article class="workout" id="mon"><div class="workout-head"><div><div class="daylabel">PONDELOK · 50–60 min</div><h3>Muscle-up A · výška + tlak</h3><p>Priorita: vysoký a rýchly zhyb</p></div><div class="counter" id="count-mon">0/0 sérií</div></div><div class="warmup"><b>Rozcvičenie:</b> 6–10 min dynamika + 2 ľahké prípravné série pred prvým ťažkým cvikom. <a href="#atlas-1">Video rozcvičky</a></div><div class="exercise" data-day="mon" data-ex="1" data-sets="4" data-reps="2–3" data-name="Výbušný vysoký zhyb" data-optional="0">
           <div class="exercise-top"><div class="order">01</div><div class="exercise-main"><div class="ex-title">Výbušný vysoký zhyb  </div><div class="rep-line"><b class="dosage">4 × 2–3</b><span>Odpočinok 3 min</span></div></div></div>
           <p>Každé opakovanie maximálne rýchle. Ukonči sériu hneď, keď klesá výška.</p><div class="alternative"><b>Ľahšia / iná variácia:</b> Náhrada: výbušný klasický zhyb; nie švih.</div>
@@ -415,7 +428,88 @@ function setupRestTimer(){
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
 }
 
+
+/* The Screen Wake Lock API keeps the display awake only while the page is visible.
+ * Browser and OS can still revoke it (e.g. power-saving mode or tab switch).
+ * The user enables this explicitly per page visit to avoid unnecessary battery use.
+ */
+function setupScreenWakeLock(){
+  const button=document.getElementById('wake-toggle');
+  const status=document.getElementById('wake-status');
+  let requested=false;
+  let sentinel=null;
+  let pending=false;
+  let generation=0;
+
+  function renderStatus(message){
+    button.setAttribute('aria-pressed',String(requested));
+    button.textContent=requested?'☀ Displej zapnutý · Vypnúť':'☀ Nezhasínať displej';
+    status.textContent=message;
+  }
+
+  if(!('wakeLock' in navigator)||!navigator.wakeLock||typeof navigator.wakeLock.request!=='function'){
+    button.disabled=true;
+    renderStatus('Tento prehliadač nepodporuje udržiavanie obrazovky. Skús aktuálny Chrome na Androide.');
+    return;
+  }
+
+  async function acquire(){
+    if(!requested||document.hidden||sentinel||pending)return;
+    const callGeneration=generation;
+    pending=true;
+    renderStatus('Zapínam udržiavanie obrazovky…');
+    try{
+      const lock=await navigator.wakeLock.request('screen');
+      if(!requested||document.hidden||callGeneration!==generation){
+        await lock.release();
+        return;
+      }
+      sentinel=lock;
+      lock.addEventListener('release',()=>{
+        if(sentinel===lock)sentinel=null;
+        if(requested){
+          renderStatus(document.hidden
+            ? 'Stránka je na pozadí. Po návrate sa ochrana skúsi obnoviť.'
+            : 'Systém vypol ochranu obrazovky. Skús tlačidlo vypnúť a zapnúť.');
+        }
+      });
+      renderStatus('Aktívne: obrazovka zostane zapnutá, kým je stránka otvorená v popredí.');
+    }catch(error){
+      if(requested&&callGeneration===generation){
+        requested=false;
+        renderStatus('Telefón ochranu nepovolil (napr. šetrenie batérie). Skús znova.');
+      }
+    }finally{
+      pending=false;
+    }
+  }
+
+  button.addEventListener('click',()=>{
+    if(requested){
+      requested=false;
+      generation++;
+      const lock=sentinel;
+      sentinel=null;
+      renderStatus('Vypnuté. Telefón bude obrazovku zamykať podľa svojich nastavení.');
+      if(lock)lock.release().catch(()=>{});
+    }else{
+      requested=true;
+      generation++;
+      acquire();
+    }
+  });
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'&&requested){
+      acquire();
+    }else if(document.hidden&&requested){
+      renderStatus('Stránka je na pozadí. Po návrate sa ochrana skúsi obnoviť.');
+    }
+  });
+}
+
 render();
 setupCollapsibleDays();
 setupRestTimer();
+setupScreenWakeLock();
 </script></body></html>
