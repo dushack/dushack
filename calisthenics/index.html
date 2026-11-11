@@ -84,6 +84,7 @@
 <p class="rest-hint"><b>Novinka:</b> Po zaškrtnutí série sa spustí časovač prestávky. <b>Zaškrtnutia sa automaticky vymažú po 10 hodinách</b> od dokončenia každej série. Každý deň môžeš zbaliť alebo rozbaliť.</p><div class="wake-control" aria-label="Nastavenie obrazovky">
   <button type="button" id="wake-toggle" aria-pressed="false" aria-describedby="wake-status">☀ Nezhasínať displej</button>
   <span id="wake-status" role="status" aria-live="polite">Vypnuté. Zapni počas tréningu, aby displej nezhasínal.</span>
+  <button type="button" id="rest-sound-test" title="Prehrať skúšobný zvuk prestávky">🔊 Test zvuku</button>
 </div>
 <div class="day-nav"><a href="#mon">Po<small>Muscle-up</small></a><a href="#tue">Ut<small>Nohy</small></a><a href="#wed">St<small>Vrchná časť</small></a><a href="#thu">Št<small>Nohy</small></a><a href="#fri">Pi<small>Muscle-up</small></a></div>
 <article class="workout" id="mon"><div class="workout-head"><div><div class="daylabel">PONDELOK · 50–60 min</div><h3>Muscle-up A · výška + tlak</h3><p>Priorita: vysoký a rýchly zhyb</p></div><div class="counter" id="count-mon">0/0 sérií</div></div><div class="warmup"><b>Rozcvičenie:</b> 6–10 min dynamika + 2 ľahké prípravné série pred prvým ťažkým cvikom. <a href="#atlas-1">Video rozcvičky</a></div><div class="exercise" data-day="mon" data-ex="1" data-sets="4" data-reps="2–3" data-name="Výbušný vysoký zhyb" data-optional="0">
@@ -358,6 +359,62 @@ function setupRestTimer(){
   const pause=document.getElementById('rest-pause');
   const close=document.getElementById('rest-close');
   let interval=null,deadline=0,remaining=0,total=0,running=false,paused=false;
+
+  /* Unlock Web Audio during a user gesture, so an automatic timer can beep later.
+     No downloadable audio files or network calls are needed. */
+  const AudioCtor=window.AudioContext||window.webkitAudioContext;
+  const testSound=document.getElementById('rest-sound-test');
+  let soundContext=null;
+  function unlockSound(){
+    if(!AudioCtor)return Promise.resolve(false);
+    try{
+      if(!soundContext)soundContext=new AudioCtor();
+      if(soundContext.state==='running')return Promise.resolve(true);
+      return soundContext.resume().then(()=>soundContext.state==='running').catch(()=>false);
+    }catch(e){return Promise.resolve(false)}
+  }
+  function playRestSound(){
+    if(!soundContext||soundContext.state!=='running')return false;
+    try{
+      const now=soundContext.currentTime+0.015;
+      [[880,0,0.16],[1174.66,0.22,0.23]].forEach(([hz,offset,duration])=>{
+        const start=now+offset;
+        const oscillator=soundContext.createOscillator();
+        const gain=soundContext.createGain();
+        oscillator.type='sine';
+        oscillator.frequency.setValueAtTime(hz,start);
+        gain.gain.setValueAtTime(0.0001,start);
+        gain.gain.exponentialRampToValueAtTime(0.12,start+0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001,start+duration);
+        oscillator.connect(gain);
+        gain.connect(soundContext.destination);
+        oscillator.start(start);
+        oscillator.stop(start+duration+0.02);
+      });
+      return true;
+    }catch(e){return false}
+  }
+  if(!AudioCtor){
+    testSound.disabled=true;
+    testSound.title='Prehliadač nepodporuje zvukové upozornenia';
+  }else{
+    // pointerdown/click/keydown are real activation events on mobile/desktop.
+    document.addEventListener('pointerdown',e=>{
+      if(e.target.closest('.setbox'))unlockSound();
+    },{passive:true});
+    document.addEventListener('click',e=>{
+      if(e.target.closest('.setbox'))unlockSound();
+    });
+    document.addEventListener('keydown',e=>{
+      if((e.key===' '||e.key==='Enter')&&e.target.matches('.setbox input'))unlockSound();
+    });
+    testSound.addEventListener('click',async()=>{
+      const ready=await unlockSound();
+      if(ready)playRestSound();
+      else testSound.title='Zvuk sa nepodarilo zapnúť; skontroluj hlasitosť a povolenia Chrome';
+    });
+  }
+
   const clock=ms=>{
     const s=Math.ceil(Math.max(0,ms)/1000);
     return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
@@ -369,6 +426,7 @@ function setupRestTimer(){
   }
   function finish(){
     remaining=0;
+    playRestSound();
     if('vibrate' in navigator){try{navigator.vibrate([140,90,140])}catch(e){}}
     closeTimer();
   }
