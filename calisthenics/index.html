@@ -368,11 +368,9 @@ function setupRestTimer(){
     fill.style.width=total?String(Math.min(100,Math.max(0,100*(total-remaining)/total)))+'%':'0%';
   }
   function finish(){
-    stopTick();running=false;paused=false;remaining=0;showTime();
-    status.textContent='Prestávka skončila ✓';
-    pause.hidden=true;
-    close.textContent='Zavrieť';
+    remaining=0;
     if('vibrate' in navigator){try{navigator.vibrate([140,90,140])}catch(e){}}
+    closeTimer();
   }
   function tick(){
     if(!running)return;
