@@ -22,13 +22,22 @@ footer{margin-top:45px;border-top:1px solid var(--line);padding-top:24px;color:v
 @media(max-width:640px){.site{padding:18px 14px 48px}.topbar{margin-bottom:19px}.top-meta{font-size:10px}.hero{border-radius:17px;padding:30px 24px 40px}.hero h1{font-size:clamp(38px,10vw,57px)}.hero p{font-size:14px}.hero .ref{display:none}.stats{grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:27px}.stat{padding:15px}.stat .num{font-size:25px}.spotlights{grid-template-columns:1fr}.spot{min-height:128px;padding:18px}.spot h3{font-size:20px}.section-heading h2{font-size:21px}.section-heading{align-items:start}.controls{grid-template-columns:1fr 1fr}.controls .input{grid-column:1/-1}.toolbar{padding:10px 0}.pill{padding:7px 10px}.series-card{gap:12px;grid-template-columns:84px minmax(0,1fr);padding:11px;min-height:236px;border-radius:13px}.cover{min-height:188px;padding:9px;border-radius:8px}.cover .monogram{font-size:27px}.cover .serial{font-size:8px}.cover .cover-foot{font-size:8px}.cardbody h3{font-size:16px}.ranking{font-size:9px}.rating{font-size:13px}.meta{margin:8px 0;gap:5px}.tag{font-size:10px;padding:2px 5px}.desc{font-size:11.6px;margin:9px 0}.bottom{padding-top:7px}.imdb-link{font-size:11px}.watch-toggle{font-size:10px}.watch-initial{font-size:9.5px}.status{font-size:10.3px}}
 @media(max-width:380px){.series-card{grid-template-columns:68px minmax(0,1fr);gap:10px}.cover .monogram{font-size:23px}.cover .cover-foot{font-size:7px}.series-card{min-height:250px}}
 @media print{body{background:white;color:#14202d}.site{max-width:100%;padding:0}.hero{background:#10242a;color:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}.hero p{color:white}.toolbar,.spotlights,.watch-toggle,.reset{display:none!important}.stats{margin:14px 0}.stat{color:black;background:white}.cards{grid-template-columns:repeat(2,1fr)}.series-card{break-inside:avoid;box-shadow:none;background:white;color:black}.cardbody h3{color:#111}.desc{color:#333}.date{color:#555}.tag{color:#444}.bottom{border-top:1px solid #aaa}.status{print-color-adjust:exact;-webkit-print-color-adjust:exact}.cover{print-color-adjust:exact;-webkit-print-color-adjust:exact}.section-heading{margin-top:20px}.footline{display:block}}
+
+/* Common home navigation */
+.top-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.top-meta .home-link{display:inline-flex;align-items:center;min-height:34px;padding:7px 11px;border-radius:9px;border:1px solid #56756c;background:#1a3234;color:#e7bb72;font-weight:850;font-size:12px;letter-spacing:0;white-space:nowrap}
+.top-meta .home-link:hover{background:#284a4b;color:#fff}
+.top-meta .edition{color:var(--muted);white-space:nowrap}
+.top-meta .edition span{color:var(--accent)}
+@media(max-width:640px){.top-meta{gap:6px}.top-meta .home-link{padding:6px 9px}.top-meta .edition{font-size:9px}}
+@media print{.home-link{display:none!important}}
 </style>
 </head>
 <body>
 <div class="site">
   <header class="topbar">
     <div class="brand"><span class="sigil" aria-hidden="true">✦</span><span>OPERÁCIA / WATCHLIST</span></div>
-    <div class="top-meta">EDÍCIA <span>08 / 11 / 2026</span></div>
+    <div class="top-meta"><a class="home-link" href="../" aria-label="Na hlavnú stránku">← Domov</a><span class="edition">EDÍCIA <span>08 / 11 / 2026</span></span></div>
   </header>
   <section class="hero" aria-labelledby="hero-title">
     <div class="eyebrow">Osobný výber · Vojna / CIA / Špeciálne jednotky</div>
