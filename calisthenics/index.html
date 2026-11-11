@@ -17,7 +17,7 @@
 .search{width:100%;padding:13px 15px;border:1px solid #aebfc7;border-radius:10px;margin:3px 0 17px;font-size:14px;background:white}.atlas-category{background:white;border:1px solid var(--line);border-radius:13px;overflow:hidden;margin-bottom:13px}.atlas-category h3{margin:0;padding:13px 16px;font-size:15px;background:#eaf1f3}.atlas-category h3 span{float:right;color:#71858b;font-size:12px;font-weight:500}.atlas-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid #edf1f2}.atlas-title{min-width:0}.atlas-title b{font-size:13px}.atlas-title small{display:block;color:var(--muted);font-size:11px}.atlas-actions{display:flex;gap:10px;white-space:nowrap}.atlas-actions a{font-size:12px;font-weight:800}.atlas-row[hidden],.atlas-category[hidden],.exercise[hidden]{display:none!important}
 .footer{font-size:12px;color:#738994;line-height:1.6;padding:28px 0}
 @media(max-width:850px){.stats{grid-template-columns:repeat(2,1fr)}.milestones{grid-template-columns:repeat(2,1fr)}.intro-grid,.readiness{grid-template-columns:1fr}.nav .links{gap:12px}}
-@media(max-width:620px){.shell{padding:0 12px 50px}.hero{padding:29px 22px;margin-top:14px;border-radius:14px}.hero h1{font-size:32px}.links a{font-size:11px}.links a:nth-child(n+3){display:none}.nav{padding:10px 14px}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:25px}.section-head h2{font-size:24px}.variants-grid,.source-grid{grid-template-columns:1fr}.milestones{grid-template-columns:1fr 1fr}.workout-head{padding:18px}.workout-head h3{font-size:19px}.exercise{padding:15px 14px}.exercise p,.exercise-bottom,.alternative{margin-left:32px}.sets{width:100%;order:2}.exercise-bottom{gap:8px}.vidlinks{order:1}.atlas-link{order:1}.day-footer{padding:10px 14px}.atlas-row{padding:10px}.atlas-actions{gap:7px}.atlas-actions a{font-size:11px}.weekday{width:100%}.weekbar{padding:14px}}
+@media(max-width:620px){.shell{padding:0 12px 50px}.hero{padding:29px 22px;margin-top:14px;border-radius:14px}.hero h1{font-size:32px}.links a{font-size:11px}.links a:nth-child(n+3){display:inline-flex}.nav{padding:10px 14px}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:25px}.section-head h2{font-size:24px}.variants-grid,.source-grid{grid-template-columns:1fr}.milestones{grid-template-columns:1fr 1fr}.workout-head{padding:18px}.workout-head h3{font-size:19px}.exercise{padding:15px 14px}.exercise p,.exercise-bottom,.alternative{margin-left:32px}.sets{width:100%;order:2}.exercise-bottom{gap:8px}.vidlinks{order:1}.atlas-link{order:1}.day-footer{padding:10px 14px}.atlas-row{padding:10px}.atlas-actions{gap:7px}.atlas-actions a{font-size:11px}.weekday{width:100%}.weekbar{padding:14px}}
 @media print{.topbar,.day-nav,.setbox,.clear-day,.weekbar button,.search{display:none!important}.hero{color:#112635;background:white;border:2px solid #112635}.hero p,.pill{color:#112635}.hero .eyebrow{color:#007e80}.hero:after{display:none}.shell{max-width:none}.workout{break-inside:avoid}.section-head{break-after:avoid}.atlas-category{break-inside:avoid}}
 
 /* V4: Home navigation, collapsible workout days, and automatic rest timer */
@@ -46,6 +46,22 @@
 .rest-timer__actions button.rest-timer__primary:hover{background:#009696}
 @media(max-width:620px){.home-link{padding:6px 8px}.workout-head{gap:9px}.workout-head>div:first-child{flex-basis:100%}.day-toggle{margin-left:auto}.rest-timer{bottom:8px;padding:14px}.rest-timer__time{font-size:32px}}
 @media print{.day-toggle,.rest-timer,.rest-hint{display:none!important}.workout-body[hidden]{display:block!important}}
+
+/* Mobile: show the full main navigation instead of hiding menu items. */
+@media(max-width:620px){
+  html{scroll-padding-top:150px}
+  .topbar .nav{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px}
+  .topbar .brand{flex:0 0 100%;font-size:15px;line-height:1.3}
+  .topbar .links{display:flex;flex:0 0 100%;width:100%;flex-wrap:wrap;gap:7px;align-items:center}
+  .topbar .links a,.topbar .links a:nth-child(n+3){
+    display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;
+    font-size:12px;font-weight:750;line-height:1.2;min-height:34px;
+    padding:7px 10px;border-radius:8px;background:#f4f8f9;
+    border:1px solid #dae5e9;color:#325668;text-decoration:none
+  }
+  .topbar .links a.home-link{color:#006c6d;background:#eaf7f3;border-color:#a9cfca}
+  .topbar .links a:focus-visible{outline:2px solid #007e80;outline-offset:2px}
+}
 </style></head><body>
 <div class="topbar"><nav class="nav"><div class="brand">CALIS<span>THENICS</span> <small style="font-size:10px;color:#718792">V3</small></div><div class="links"><a class="home-link" href="../" title="Na hlavnú stránku">← Domov</a><a href="#rozpis">Rozpis</a><a href="#cvicenia">Tréningy</a><a href="#varianty">Varianty</a><a href="#atlas">Videoatlas</a></div></nav></div>
 <main class="shell">
